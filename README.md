@@ -1,2 +1,1 @@
-Test site for shop(for now)
-https://shop.prosto-land.top
+Page for - https://shop.prosto-land.top
