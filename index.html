@@ -309,7 +309,7 @@
 </main>
 
 <footer>
-    <p> 2022-2025 Prosto-Land.</p>
+    <p> 2022-<span id="year"></span> Prosto-Land.</p>
     <p>Not an official Minecraft product. We are in no way affiliated with or endorsed by Mojang Synergies AB, Microsoft Corporation or other rightsholders.</p>
 </footer>
 
@@ -455,7 +455,6 @@
     }
 
     nicknameInput.addEventListener('input', validateForm);
-    handleSelectChange(); 
 
     function openPaymentModal() {
         const nickname = nicknameInput.value.trim();
@@ -489,7 +488,10 @@
         if (event.target == supportModal) closeModal('supportModal');
     }
 
-    document.addEventListener('DOMContentLoaded', handleSelectChange);
+    document.addEventListener('DOMContentLoaded', () => {
+        handleSelectChange();
+        document.getElementById('year').textContent = new Date().getFullYear();
+    });
 </script>
 
 </body>
