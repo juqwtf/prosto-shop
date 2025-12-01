@@ -320,17 +320,16 @@
         
         <div class="modal-step">
             <p>1. Сума до сплати: <span id="modal-price" class="highlight-text">0</span> грн</p>
-            <p style="font-size:0.8em; color:#aaa;">(Сплатіть ТОЧНО цю суму)</p>
         </div>
 
         <div class="checkbox-group">
             <div class="checkbox-item" onclick="toggleCheckbox('check-played')">
                 <input type="checkbox" id="check-played" onchange="validateModal()">
-                <label for="check-played">Я підтверджую, що цей нікнейм хоча б раз заходив на сервер.</label>
+                <label for="check-played">Я підтверджую, що цей нікнейм був на сервері.</label>
             </div>
             <div class="checkbox-item" onclick="toggleCheckbox('check-refund')">
                 <input type="checkbox" id="check-refund" onchange="validateModal()">
-                <label for="check-refund">Я розумію, що кошти не повертаються (добровільна пожертва).</label>
+                <label for="check-refund">Я розумію, що кошти не повертаються (добровільна пожертва для розвитку проекту).</label>
             </div>
         </div>
 
@@ -447,7 +446,7 @@
         
         if (isPlayedChecked && isRefundChecked) {
             monoLink.classList.remove('disabled-link');
-            monoLink.textContent = "Перейти до оплати Monobank";
+            monoLink.textContent = "Перейти до оплати";
         } else {
             monoLink.classList.add('disabled-link');
             monoLink.textContent = "Підтвердіть умови вище";
