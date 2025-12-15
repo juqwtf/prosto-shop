@@ -19,6 +19,8 @@
             --shadow-color: rgba(0, 0, 0, 0.4);
             --hover-shadow-color: rgba(31, 208, 205, 0.3); 
             --input-bg: #2b2b2b;
+            --error-color: #ff4d4d;
+            --success-color: #4dff88;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -72,11 +74,13 @@
             gap: 20px;
             margin-bottom: 8px;
             text-align: left;
+            align-items: flex-start;
         }
         
         .inputs-row .form-group {
             flex: 1;
             margin-bottom: 0;
+            position: relative;
         }
 
         .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--highlight-color); }
@@ -85,9 +89,36 @@
             width: 100%; padding: 12px 15px; font-size: 1em; 
             background-color: var(--input-bg); color: var(--text-color);
             border: 1px solid #555; border-radius: 8px; outline: none;
-            transition: border-color 0.2s; cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s; cursor: pointer;
         }
-        #nickname-input { cursor: text; }
+        #nickname-input { cursor: text; padding-left: 45px; }
+        
+        #nickname-input.valid { border-color: var(--success-color); box-shadow: 0 0 8px rgba(77, 255, 136, 0.2); }
+        #nickname-input.invalid { border-color: var(--error-color); box-shadow: 0 0 8px rgba(255, 77, 77, 0.2); }
+
+        .input-icon-wrapper { position: relative; width: 100%; }
+        .avatar-preview {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            background-color: #444;
+            background-size: cover;
+            border: 1px solid #666;
+            transition: background-image 0.3s ease;
+        }
+
+        .validation-msg {
+            font-size: 0.8em;
+            margin-top: 5px;
+            height: 18px;
+            color: var(--error-color);
+            display: none;
+        }
+
         #item-select:focus, #nickname-input:focus { border-color: var(--highlight-color); }
         #item-select:hover { background-color: var(--button-hover-bg); }
         
@@ -101,15 +132,8 @@
             font-size: 0.9em; line-height: 1.6; 
             color: #ddd;
         }
-        .description-box b {
-            color: #fff;
-            font-size: 1.1em;
-        }
-        .chance-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 10px;
-        }
+        .description-box b { color: #fff; font-size: 1.1em; }
+        .chance-list { list-style: none; padding: 0; margin-top: 10px; }
 
         .checkbox-group {
             text-align: left; margin: 15px 0; padding: 15px;
@@ -162,7 +186,7 @@
            border: none;
            text-transform: uppercase;
            letter-spacing: 1px;
-}
+        }
         .buy-btn:hover {
             background-image: linear-gradient(45deg, #1a9a98 0%, var(--highlight-color) 100%);
             box-shadow: 0 4px 25px var(--hover-shadow-color); transform: scale(1.02);
@@ -214,11 +238,8 @@
         .mono-btn:hover { background-color: #333; }
 
         .disabled-link {
-            pointer-events: none;
-            opacity: 0.5;
-            background-color: #222;
-            border-color: #555;
-            color: #888;
+            pointer-events: none; opacity: 0.5;
+            background-color: #222; border-color: #555; color: #888;
         }
 
         .support-options {
@@ -243,11 +264,7 @@
             .top-bar-nav.is-active a { padding: 15px; margin: 0; font-size: 1.2em; text-align: center; width: 90%; max-width: 400px; min-width: auto; }
             .top-bar-nav.is-active .close-menu-btn { display: block; position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 2.5em; color: #fff; cursor: pointer; }
             body.menu-open { overflow: hidden; }
-
-            .inputs-row {
-                flex-direction: column;
-                gap: 15px;
-            }
+            .inputs-row { flex-direction: column; gap: 15px; }
         }
     </style>
 </head>
@@ -276,7 +293,11 @@
     <div class="inputs-row">
         <div class="form-group">
             <label for="nickname-input">Ваш нікнейм у Minecraft:</label>
-            <input type="text" id="nickname-input" placeholder="Введіть точний нікнейм..." required>
+            <div class="input-icon-wrapper">
+                <div id="avatar-preview" class="avatar-preview" style="background-image: url('https://minotar.net/helm/Steve/100.png');"></div>
+                <input type="text" id="nickname-input" placeholder="Введіть точний нікнейм..." autocomplete="off">
+            </div>
+            <div id="validation-msg" class="validation-msg"></div>
         </div>
 
         <div class="form-group">
@@ -309,7 +330,7 @@
 
 <footer>
     <p> 2022-<span id="year"></span> Prosto-Land.</p>
-    <p>Not an official Minecraft product. We are in no way affiliated with or endorsed by Mojang Synergies AB, Microsoft Corporation or other rightsholders.</p>
+    <p>Not an official Minecraft product.</p>
 </footer>
 
 <div id="paymentModal" class="modal">
@@ -328,7 +349,7 @@
             </div>
             <div class="checkbox-item" onclick="toggleCheckbox('check-refund')">
                 <input type="checkbox" id="check-refund" onchange="validateModal()">
-                <label for="check-refund">Я розумію, що кошти не повертаються (Донат - це добровільна пожертва для розвитку проекту).</label>
+                <label for="check-refund">Я розумію, що кошти не повертаються (Донат - це добровільна пожертва).</label>
             </div>
         </div>
 
@@ -338,7 +359,7 @@
         </div>
         
         <p style="font-size: 0.8em; color: #aaa; margin-top: 15px;">
-            Після оплати зачекайте 1-2 хвилини. Донат буде видано автоматично.
+            Після оплати зачекайте 1-2 хвилини.
         </p>
     </div>
 </div>
@@ -347,8 +368,6 @@
     <div class="modal-content" style="max-width: 400px;">
         <span class="close-modal" onclick="closeModal('supportModal')">&times;</span>
         <h2>Оберіть спосіб зв'язку</h2>
-        <p style="color:#ccc; margin-bottom: 20px;">Ми допоможемо вирішити проблему!</p>
-        
         <div class="support-options">
             <a href="https://t.me/juqwtf" target="_blank" class="support-link telegram-bg">Telegram</a>
             <a href="https://discord.com/users/814584250535379004" target="_blank" class="support-link discord-bg">Discord</a>
@@ -371,41 +390,70 @@
     closeMenuBtn.addEventListener('click', () => toggleMenu(false));
 
     const descriptions = {
-        item1: "<b>Права Гравця:</b><br>1. 1 приватів /rg<br>2. 1 точка дому /sethome<br>3. 5 речей на аукціоні /ah sell<br>4. Стати в афк /afk<br>5. Кіт старт (Кожні 24 год) /kit start<br>6. Використовування стандартних команд",
-        item2: "<b>Права Сержанта:</b><br>1. 2 приватів /rg<br>2. 2 точки дому /sethome<br>3. 5 речей на аукціоні /ah sell<br>4. Верстак /wb або /workbench<br>5. Кіт Сержанта (Кожні 7д) /kit sergant<br>6. Одіти на голову /hat<br>7. Всі права минулих донатів (окрім набора/кіта)",
-        item3: "<b>Права Майора:</b><br>1. 3 приватів /rg<br>2. 3 точок дому /sethome<br>3. 10 речей на аукціоні /ah sell<br>4. Повернутися назад /back<br>5. Кіт Майора (Кожні 7д) /kit mayor<br>6. Ендер сундук /ec<br>7. Відновити голод /feed<br>8. Всі права минулих донатів (окрім набора/кіта)",
-        item4: "<b>Права Генерала:</b><br>1. 5 приватів /rg<br>2. 5 точок дому /sethome<br>3. 15 речей на аукціоні /ah sell<br>4. Подивитися інвентар /invsee<br>5. Кіт Генерал (Кожні 7д) /kit general<br>6. Політ /fly<br>7. Починити річ /repair<br>8. Відновити здоров'я /heal<br>9. Всі права минулих донатів (окрім набора/кіта)",
-        item5: "<b>Права Спонсора:</b><br>1. 10 приватів /rg<br>2. 10 точок дому /sethome<br>3. 25 речей на аукціоні /ah sell<br>4. Заміну часу для себе /ptime<br>5. Кіт Спонсор (Кожні 7д) /kit sponsor<br>6. Заміна нікнейма(фейк) /nick<br>7. Подивитися хто рядом /near<br>8. Зміну погоди /weather<br>9. Віртуальна наковальня /anvil<br>10. Всі права минулих донатів (окрім набора/кіта)",
-        
-        case1: `<b>Донат кейс:</b><br><br><b>Вміст кейсу:</b><ul class="chance-list">
-                <li>Сержант - 65%</li>
-                <li>Майор - 20%</li>
-                <li>Генерал - 10%</li>
-                <li>Спонсор - 5%</li>
-                </ul>`,
-        
-        case2: `<b>Кейс із донат речами:</b><br><br><b>Вміст кейсу:</b><ul class="chance-list">
-                <li>Корисна безкорисність - 60%</li>
-                <li>Стріла Швидкості - 50%</li>
-                <li>Амулет Життя - 45%</li>
-                <li>Посох захисту - 40%</li>
-                <li>Віяло польоту - 35%</li>
-                <li>Мультитул - 30%</li>
-                </ul>`,
-
-        stars100: "<b>100 зірочок</b><br><br>Зірочка✬ - це донат-валюта, за яку можна купувати дорогоцінні предмети у донат магазині, та також можна відкривати різні цікавинки.",
-        stars200: "<b>200 зірочок</b><br><br>Зірочка✬ - це донат-валюта, за яку можна купувати дорогоцінні предмети у донат магазині, та також можна відкривати різні цікавинки.",
-        stars500: "<b>500 зірочок</b><br><br>Зірочка✬ - це донат-валюта, за яку можна купувати дорогоцінні предмети у донат магазині, та також можна відкривати різні цікавинки.",
+        item1: "<b>Права Гравця:</b><br>Базовий набір прав.",
+        item2: "<b>Права Сержанта:</b><br>2 привати, /kit sergant, /hat, /workbench.",
+        item3: "<b>Права Майора:</b><br>3 привати, /kit mayor, /back, /ec, /feed.",
+        item4: "<b>Права Генерала:</b><br>5 приватів, /fly, /repair, /heal, /kit general.",
+        item5: "<b>Права Спонсора:</b><br>10 приватів, /ptime, /nick, /near, /weather, /anvil.",
+        case1: `<b>Донат кейс:</b><br>Шанс вибити від Сержанта до Спонсора.`,
+        case2: `<b>Кейс із речами:</b><br>Корисні предмети з зачаруваннями.`,
+        stars100: "<b>100 зірочок</b><br>Валюта для магазину.",
+        stars200: "<b>200 зірочок</b><br>Валюта для магазину.",
+        stars500: "<b>500 зірочок</b><br>Валюта для магазину.",
         default: "Оберіть послугу зі списку вище, щоб побачити детальний опис."
     };
 
     const select = document.getElementById("item-select");
     const nicknameInput = document.getElementById("nickname-input");
+    const validationMsg = document.getElementById("validation-msg");
+    const avatarPreview = document.getElementById("avatar-preview");
     const descriptionText = document.getElementById("item-description");
     const buyBtn = document.getElementById("buy-btn");
     const paymentModal = document.getElementById("paymentModal");
     const supportModal = document.getElementById("supportModal");
     const monoLink = document.getElementById('mono-link');
+
+    const nickRegex = /^[a-zA-Z0-9_]{3,16}$/;
+
+    function validateNickname(nick) {
+        if (nick.length === 0) return { valid: false, msg: "" };
+        if (nick.length < 3) return { valid: false, msg: "Занадто короткий нік (мін. 3)" };
+        if (nick.length > 16) return { valid: false, msg: "Занадто довгий нік (макс. 16)" };
+        if (!nickRegex.test(nick)) return { valid: false, msg: "Тільки англ. літери, цифри та '_'" };
+        return { valid: true, msg: "" };
+    }
+
+    function updateAvatar(nick) {
+        if (validateNickname(nick).valid) {
+            avatarPreview.style.backgroundImage = `url('https://minotar.net/helm/${nick}/100.png')`;
+        } else {
+            avatarPreview.style.backgroundImage = `url('https://minotar.net/helm/Steve/100.png')`;
+        }
+    }
+
+    function handleInput() {
+        const nick = nicknameInput.value.trim();
+        const result = validateNickname(nick);
+        
+        nicknameInput.classList.remove('valid', 'invalid');
+        validationMsg.style.display = 'none';
+
+        if (nick.length > 0) {
+            if (result.valid) {
+                nicknameInput.classList.add('valid');
+                updateAvatar(nick);
+            } else {
+                nicknameInput.classList.add('invalid');
+                validationMsg.textContent = result.msg;
+                validationMsg.style.display = 'block';
+                updateAvatar('Steve');
+            }
+        } else {
+             updateAvatar('Steve');
+        }
+        
+        validateForm();
+    }
 
     function handleSelectChange() {
         const selectedValue = select.value;
@@ -413,22 +461,19 @@
         validateForm();
     }
 
-    function toggleCheckbox(id) {
-        if (event.target.type === 'checkbox') return;
-        const checkbox = document.getElementById(id);
-        checkbox.checked = !checkbox.checked;
-        validateModal(); 
-    }
-
     function validateForm() {
-        const hasNickname = nicknameInput.value.trim().length > 0;
+        const nick = nicknameInput.value.trim();
+        const isNickValid = validateNickname(nick).valid;
         const selectedOption = select.options[select.selectedIndex];
         const price = selectedOption.getAttribute('data-price');
         
         if (price && parseFloat(price) > 0) {
-            buyBtn.disabled = !hasNickname;
-            buyBtn.textContent = hasNickname ? `Оплатити ${price} грн` : "Введіть нікнейм";
-            buyBtn.style.display = 'inline-block';
+            buyBtn.disabled = !isNickValid;
+            if (!isNickValid) {
+                buyBtn.textContent = nick.length > 0 ? "Виправте нікнейм" : "Введіть нікнейм";
+            } else {
+                buyBtn.textContent = `Оплатити ${price} грн`;
+            }
         } else if (price && parseFloat(price) === 0) {
              buyBtn.disabled = true;
              buyBtn.textContent = "Безкоштовно (Вже доступно)";
@@ -436,6 +481,15 @@
             buyBtn.disabled = true;
             buyBtn.textContent = "Оплатити";
         }
+    }
+
+    nicknameInput.addEventListener('input', handleInput);
+
+    function toggleCheckbox(id) {
+        if (event.target.type === 'checkbox') return;
+        const checkbox = document.getElementById(id);
+        checkbox.checked = !checkbox.checked;
+        validateModal(); 
     }
 
     function validateModal() {
@@ -451,14 +505,14 @@
         }
     }
 
-    nicknameInput.addEventListener('input', validateForm);
-
     function openPaymentModal() {
-        const nickname = nicknameInput.value.trim();
+        const nick = nicknameInput.value.trim();
+        if (!validateNickname(nick).valid) return;
+
         const selectedOption = select.options[select.selectedIndex];
         const price = selectedOption.getAttribute('data-price');
         
-        if (!nickname || !price) return;
+        if (!price) return;
 
         document.getElementById('check-played').checked = false;
         document.getElementById('check-refund').checked = false;
@@ -466,19 +520,14 @@
 
         document.getElementById('modal-price').textContent = price;
         const jarBaseUrl = "https://send.monobank.ua/jar/3J4qpGuoW2";
-        const finalLink = `${jarBaseUrl}?t=${encodeURIComponent(nickname)}&a=${price}`;
+        const finalLink = `${jarBaseUrl}?t=${encodeURIComponent(nick)}&a=${price}`;
         monoLink.href = finalLink;
         
         paymentModal.style.display = "block";
     }
 
-    function openSupportModal() {
-        supportModal.style.display = "block";
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = "none";
-    }
+    function openSupportModal() { supportModal.style.display = "block"; }
+    function closeModal(modalId) { document.getElementById(modalId).style.display = "none"; }
 
     window.onclick = function(event) {
         if (event.target == paymentModal) closeModal('paymentModal');
