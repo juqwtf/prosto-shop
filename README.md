@@ -1,1 +1,1 @@
-Page for - https://shop.prosto-land.top
+Page - https://shop.prosto-land.top
