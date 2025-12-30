@@ -319,7 +319,7 @@
             <label for="nickname-input">Ваш нікнейм у Minecraft:</label>
             <div class="input-icon-wrapper">
                 <div id="avatar-preview" class="avatar-preview" style="background-image: url('https://minotar.net/helm/Steve/100.png');"></div>
-                <input type="text" id="nickname-input" placeholder="Введіть точний нікнейм..." autocomplete="off">
+                <input type="text" id="nickname-input" placeholder="Введіть нікнейм..." autocomplete="off">
             </div>
             <div id="validation-msg" class="validation-msg"></div>
         </div>
@@ -370,10 +370,6 @@
         </div>
 
         <div class="checkbox-group">
-            <div class="checkbox-item" onclick="toggleCheckbox('check-played')">
-                <input type="checkbox" id="check-played" onchange="validateModal()">
-                <label for="check-played">Я підтверджую, що цей нікнейм був на сервері.</label>
-            </div>
             <div class="checkbox-item" onclick="toggleCheckbox('check-refund')">
                 <input type="checkbox" id="check-refund" onchange="validateModal()">
                 <label for="check-refund">Я розумію, що кошти не повертаються (Донат - це добровільна пожертва).</label>
@@ -576,10 +572,9 @@
     }
 
     function validateModal() {
-        const isPlayedChecked = document.getElementById('check-played').checked;
         const isRefundChecked = document.getElementById('check-refund').checked;
         
-        if (isPlayedChecked && isRefundChecked) {
+        if (isRefundChecked) {
             monoLink.classList.remove('disabled-link');
             monoLink.textContent = "Перейти до оплати";
         } else {
@@ -597,7 +592,6 @@
         
         if (!price) return;
 
-        document.getElementById('check-played').checked = false;
         document.getElementById('check-refund').checked = false;
         validateModal(); 
 
