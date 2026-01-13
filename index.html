@@ -316,9 +316,9 @@
 
     <div class="inputs-row">
         <div class="form-group">
-            <label for="nickname-input">Ваш нікнейм у Minecraft:</label>
+            <label for="nickname-input">Ваш нікнейм:</label>
             <div class="input-icon-wrapper">
-                <div id="avatar-preview" class="avatar-preview" style="background-image: url('https://minotar.net/helm/Steve/100.png');"></div>
+                <div id="avatar-preview" class="avatar-preview" style="background-image: url('https://minotar.net/helm/Hausemaster/100.png');"></div>
                 <input type="text" id="nickname-input" placeholder="Введіть нікнейм..." autocomplete="off">
             </div>
             <div id="validation-msg" class="validation-msg"></div>
@@ -382,7 +382,8 @@
         </div>
         
         <p style="font-size: 0.8em; color: #aaa; margin-top: 15px;">
-            Після оплати зачекайте 1-2 хвилини.
+            Після оплати зачекайте 1-2 хвилини, система перевіряє надходження.
+	    У разі будь-якої проблеми звертайтеся до тех підтримки. 
         </p>
     </div>
 </div>
@@ -506,7 +507,7 @@
         if (validateNickname(nick).valid) {
             avatarPreview.style.backgroundImage = `url('https://minotar.net/helm/${nick}/100.png')`;
         } else {
-            avatarPreview.style.backgroundImage = `url('https://minotar.net/helm/Steve/100.png')`;
+            avatarPreview.style.backgroundImage = `url('https://minotar.net/helm/Hausemaster/100.png')`;
         }
     }
 
