@@ -471,7 +471,7 @@
                 let dateStr = item.time;
                 try {
                     const dateObj = new Date(item.time);
-                    dateStr = dateObj.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' }) + " " + dateObj.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+                    dateStr = dateObj.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' }) + " " + dateObj.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
                 } catch(e) {}
 
                 html += `<li class="donate-item"><div class="donate-header">${item.nick} <span style="font-weight:normal; color:#ccc;">придбав</span> <span class="highlight">${item.item}</span></div><div class="donate-meta">${dateStr}</div></li>`;
