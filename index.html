@@ -119,6 +119,9 @@
         .checkbox-item input[type="checkbox"]:checked::after { content: '✔'; position: absolute; color: #000; font-size: 16px; left: 4px; top: -1px; font-weight: bold; }
         .checkbox-item label { color: #ccc; font-size: 0.9em; cursor: pointer; line-height: 1.4; user-select: none; }
         .checkbox-item:hover label { color: #fff; }
+        
+        .offer-link { color: var(--highlight-color); text-decoration: underline; font-weight: bold; cursor: pointer; transition: color 0.2s; }
+        .offer-link:hover { color: #fff; }
 
         .buy-btn {
            display: inline-block; width: 100%; padding: 10px 20px; margin-top: 25px;
@@ -136,6 +139,8 @@
         footer p { margin-bottom: 5px; }
 
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
+        #offerModal { z-index: 200; }
+
         .modal-content { background-color: #222; margin: 5% auto; padding: 30px; border: 1px solid var(--highlight-color); border-radius: 12px; width: 90%; max-width: 500px; text-align: center; position: relative; box-shadow: 0 0 20px rgba(31, 208, 205, 0.2); }
         .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
         .close-modal:hover { color: #fff; }
@@ -223,6 +228,7 @@
 
     <div style="margin-top: 10px;">
         <button class="trigger-btn" onclick="openLeftModal()">Останні покупки</button>
+        <button class="trigger-btn" onclick="openOfferModal()">Публічна оферта</button>
         <button class="trigger-btn" onclick="openSupportModal()">Не прийшов донат? Звертайся до Підтримки</button>
     </div>
 </main>
@@ -238,16 +244,39 @@
         <h2>Інструкція з оплати</h2>
         <div class="modal-step"><p>1. Сума до сплати: <span id="modal-price" class="highlight-text">0</span> грн</p></div>
         <div class="checkbox-group">
-            <div class="checkbox-item" onclick="toggleCheckbox('check-refund')">
+            <div class="checkbox-item">
                 <input type="checkbox" id="check-refund" onchange="validateModal()">
-                <label for="check-refund">Я розумію, що кошти не повертаються (Донат - це добровільна пожертва).</label>
+                <label for="check-refund">
+                    Я погоджуюсь з умовами <span class="offer-link" onclick="openOfferModal(event)">Публічної оферти</span>
+                </label>
             </div>
         </div>
         <div class="modal-step" style="border-bottom: none;">
             <p>2. Натисніть кнопку, щоб відкрити посилання:</p>
             <a id="mono-link" href="#" target="_blank" class="mono-btn disabled-link">Перейти до оплати</a>
         </div>
-        <p style="font-size: 0.8em; color: #aaa; margin-top: 15px;">Після оплати зачекайте 1-2 хвилини, система перевіряє надходження.<br> У разі будь-якої проблеми звертайтеся до тех підтримки.</p>
+        <p style="font-size: 0.8em; color: #aaa; margin-top: 15px;">Після оплати зачекайте 1-2 хвилини, система перевіряє надходження.</p>
+    </div>
+</div>
+
+<div id="offerModal" class="modal">
+    <div class="modal-content" style="max-width: 600px; text-align: left; max-height: 80vh; overflow-y: auto;">
+        <span class="close-modal" onclick="closeModal('offerModal')">&times;</span>
+        <h2 style="text-align: center;">Публічна оферта</h2>
+        <div style="font-size: 0.95em; line-height: 1.5; color: #ccc;">
+            <p style="margin-bottom: 12px;">
+                Здійснюючи платіж на користь проекту <b>prosto-land</b>, ви підтверджуєте, що це ваше добровільне рішення допомогти серверу.
+            </p>
+            <p style="margin-bottom: 12px;">
+                Усі кошти є добровільною пожертвою та спрямовуються виключно на <b>оновлення, технічне обслуговування та розвиток проекту</b>.
+            </p>
+            <p style="margin-bottom: 12px;">
+                Повернення коштів не передбачено. У разі блокування акаунту за порушення правил серверу, всі ігрові цінності та привілеї анулюються без компенсації.
+            </p>
+            <p style="margin-top: 20px; text-align: center;">
+                <button class="mono-btn" onclick="closeModal('offerModal')" style="width: auto; padding: 8px 30px; display: inline-block;">Зрозуміло</button>
+            </p>
+        </div>
     </div>
 </div>
 
@@ -444,11 +473,10 @@
             monoLink.textContent = "Підтвердіть умови";
         }
     }
-    
-    function toggleCheckbox(id) {
-        const el = document.getElementById(id);
-        el.checked = !el.checked;
-        validateModal();
+
+    function openOfferModal(e) {
+        if(e) { e.preventDefault(); e.stopPropagation(); }
+        document.getElementById('offerModal').style.display = "block";
     }
 
     async function openLeftModal() { 
@@ -482,7 +510,7 @@
             container.innerHTML = '<p style="color: var(--error-color)">Не вдалося завантажити.</p>';
         }
     }
-
+    
     function toggleMenu(show) {
         navLinks.classList.toggle('is-active', show);
         body.classList.toggle('menu-open', show);
@@ -492,8 +520,14 @@
     closeMenuBtn.onclick = () => toggleMenu(false);
 
     function openSupportModal() { document.getElementById('supportModal').style.display = "block"; }
+    
     function closeModal(id) { document.getElementById(id).style.display = "none"; }
-    window.onclick = (e) => { if(e.target.classList.contains('modal')) e.target.style.display = "none"; };
+    
+    window.onclick = (e) => { 
+        if(e.target.classList.contains('modal')) {
+            e.target.style.display = "none"; 
+        }
+    };
 
     document.addEventListener('DOMContentLoaded', () => {
         loadProducts();
